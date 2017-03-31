@@ -23,7 +23,10 @@ int main()
 	server.sin_family = PF_INET;
 	server.sin_port = htons(PORT);
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
-
+	//不同地址相同端口可以监听
+	int opt = 1;
+	setsockopt(server_id, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	
 	Bind(server_id, (struct sockaddr*)&server, sizeof(server));
 	Listen(server_id, 20);
 	printf("Accept connections...\n");
