@@ -8,16 +8,22 @@
 #include <ctype.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "wrap.h"
 
 
 #define PORT 8000
 #define MAXLINE 1024
 int main(int argc, char* agrv[])
 {
+	if (argc != 2)
+	{
+		fputs("usage: ./client message\n", stderr);
+		exit(1);
+	}
+
+	char* str = agrv[1];
 	char buf[MAXLINE];
 	memset(buf, 0, sizeof(buf));
-	int server_id = Socket(PF_INET, SOCK_STREAM, 0);
+	int server_id = socket(PF_INET, SOCK_STREAM, 0);
 
 	struct sockaddr_in server;
 	bzero(&server, sizeof(server));	
@@ -25,17 +31,14 @@ int main(int argc, char* agrv[])
 	server.sin_port = htons(PORT);
 	inet_pton(PF_INET, "127.0.0.1", &server.sin_addr);
 
-	Connect(server_id, (struct sockaddr*)&server, sizeof(server));
+	connect(server_id, (struct sockaddr*)&server, sizeof(server));
+	//while(1){}
+	write(server_id, str, strlen(str));
 
-	while (fgets(buf, MAXLINE, stdin) != NULL) {
-		Write(server_id, buf, strlen(buf));
-		int n = Read(server_id, buf, MAXLINE);
-		if (n == 0) {
-			printf("the other side has been closed.\n");
-		} else {
-			Write(STDOUT_FILENO, buf, n);
-		}
-	}
-	Close(server_id);
+	int n = read(server_id, buf, MAXLINE);
+	printf("Response from server:\n");
+	write(STDOUT_FILENO, buf, n);
+
+	close(server_id);
 	return 0;
 }
