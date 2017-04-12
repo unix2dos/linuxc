@@ -8,6 +8,9 @@ int main (int argc, char* argv[]){
 	sigemptyset(&set);
 	sigaddset(&set, SIGINT);//ctrl+c
 	sigaddset(&set, SIGTSTP);//ctrl+z
+	sigaddset(&set, SIGKILL);//kill无效
+	sigaddset(&set, 30);//kill有效
+	sigaddset(&set, 31);//kill有效
 	sigprocmask(SIG_BLOCK, &set, NULL);
 
 	while (1) {
